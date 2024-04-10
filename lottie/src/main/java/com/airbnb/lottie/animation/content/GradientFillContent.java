@@ -4,6 +4,7 @@ import static com.airbnb.lottie.utils.MiscUtils.clamp;
 
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
@@ -25,6 +26,7 @@ import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.animation.LPaint;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.DropShadowKeyframeAnimation;
+import com.airbnb.lottie.animation.keyframe.ThresholdKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.model.content.GradientColor;
@@ -65,6 +67,8 @@ public class GradientFillContent
   float blurMaskFilterRadius = 0f;
   @Nullable private DropShadowKeyframeAnimation dropShadowAnimation;
 
+  @Nullable private ThresholdKeyframeAnimation thresholdEffectAnimation;
+
   public GradientFillContent(final LottieDrawable lottieDrawable, LottieComposition composition, BaseLayer layer, GradientFill fill) {
     this.layer = layer;
     name = fill.getName();
@@ -97,6 +101,9 @@ public class GradientFillContent
     }
     if (layer.getDropShadowEffect() != null) {
       dropShadowAnimation = new DropShadowKeyframeAnimation(this, layer, layer.getDropShadowEffect());
+    }
+    if (layer.getThresholdEffect() != null) {
+      thresholdEffectAnimation = new ThresholdKeyframeAnimation(this, layer, layer.getThresholdEffect());
     }
   }
 
@@ -150,6 +157,9 @@ public class GradientFillContent
     }
     if (dropShadowAnimation != null) {
       dropShadowAnimation.applyTo(paint);
+    }
+    if (thresholdEffectAnimation != null) {
+      thresholdEffectAnimation.applyTo(paint);
     }
 
     int alpha = (int) ((parentAlpha / 255f * opacityAnimation.getValue() / 100f) * 255);

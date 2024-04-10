@@ -12,6 +12,7 @@ import com.airbnb.lottie.model.content.ContentModel;
 import com.airbnb.lottie.model.content.LBlendMode;
 import com.airbnb.lottie.model.content.Mask;
 import com.airbnb.lottie.parser.DropShadowEffect;
+import com.airbnb.lottie.parser.ThresholdEffect;
 import com.airbnb.lottie.value.Keyframe;
 
 import java.util.List;
@@ -64,6 +65,8 @@ public class Layer {
   @Nullable private final DropShadowEffect dropShadowEffect;
   private final LBlendMode blendMode;
 
+  @Nullable private final ThresholdEffect thresholdEffect;
+
 
   public Layer(List<ContentModel> shapes, LottieComposition composition, String layerName, long layerId,
       LayerType layerType, long parentId, @Nullable String refId, List<Mask> masks,
@@ -72,7 +75,7 @@ public class Layer {
       @Nullable AnimatableTextFrame text, @Nullable AnimatableTextProperties textProperties,
       List<Keyframe<Float>> inOutKeyframes, MatteType matteType,
       @Nullable AnimatableFloatValue timeRemapping, boolean hidden, @Nullable BlurEffect blurEffect,
-      @Nullable DropShadowEffect dropShadowEffect, LBlendMode blendMode) {
+      @Nullable DropShadowEffect dropShadowEffect, LBlendMode blendMode, @Nullable ThresholdEffect thresholdEffect) {
     this.shapes = shapes;
     this.composition = composition;
     this.layerName = layerName;
@@ -98,6 +101,7 @@ public class Layer {
     this.blurEffect = blurEffect;
     this.dropShadowEffect = dropShadowEffect;
     this.blendMode = blendMode;
+    this.thresholdEffect = thresholdEffect;
   }
 
   LottieComposition getComposition() {
@@ -203,6 +207,10 @@ public class Layer {
 
   @Nullable public DropShadowEffect getDropShadowEffect() {
     return dropShadowEffect;
+  }
+
+  @Nullable public ThresholdEffect getThresholdEffect() {
+    return thresholdEffect;
   }
 
   public String toString(String prefix) {
