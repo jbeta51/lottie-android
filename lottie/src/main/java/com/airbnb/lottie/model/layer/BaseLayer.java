@@ -8,7 +8,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RecordingCanvas;
 import android.graphics.RectF;
+import android.graphics.RenderEffect;
+import android.graphics.RenderNode;
 import android.os.Build;
 
 import androidx.annotation.CallSuper;
@@ -24,6 +27,7 @@ import com.airbnb.lottie.animation.content.DrawingContent;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.FloatKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.MaskKeyframeAnimation;
+import com.airbnb.lottie.animation.keyframe.ThresholdKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.TransformKeyframeAnimation;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.model.KeyPathElement;
@@ -118,6 +122,7 @@ public abstract class BaseLayer
   float blurMaskFilterRadius = 0f;
   @Nullable BlurMaskFilter blurMaskFilter;
 
+  ThresholdKeyframeAnimation thresholdEffectAnimation;
   BaseLayer(LottieDrawable lottieDrawable, Layer layerModel) {
     this.lottieDrawable = lottieDrawable;
     this.layerModel = layerModel;
@@ -143,6 +148,11 @@ public abstract class BaseLayer
         animation.addUpdateListener(this);
       }
     }
+
+    if (layerModel.getThresholdEffect() != null) {
+      this.thresholdEffectAnimation = new ThresholdKeyframeAnimation(this, this, layerModel.getThresholdEffect());
+    }
+
     setupInOutAnimations();
   }
 
@@ -227,9 +237,21 @@ public abstract class BaseLayer
 
     boundsMatrix.preConcat(transform.getMatrix());
   }
-
   @Override
   public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
+    RenderNode rn = new RenderNode("contentNode");
+    rn.setPosition(0, 0, canvas.getWidth() + 150, canvas.getHeight());
+    if (thresholdEffectAnimation != null) {
+      rn.setRenderEffect(RenderEffect.createRuntimeShaderEffect(thresholdEffectAnimation.getThresholdShader(),
+          "u_layer"));
+    }
+    RecordingCanvas recordingCanvas = rn.beginRecording();
+    onDraw(recordingCanvas, parentMatrix, parentAlpha);
+    rn.endRecording();
+    canvas.drawRenderNode(rn);
+  }
+
+  public void onDraw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     L.beginSection(drawTraceName);
     if (!visible || layerModel.isHidden()) {
       L.endSection(drawTraceName);
@@ -646,11 +668,6 @@ public abstract class BaseLayer
   @Nullable
   public DropShadowEffect getDropShadowEffect() {
     return layerModel.getDropShadowEffect();
-  }
-
-  @Nullable
-  public ThresholdEffect getThresholdEffect() {
-    return layerModel.getThresholdEffect();
   }
 
   @Override

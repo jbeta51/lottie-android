@@ -18,15 +18,15 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
   private final RuntimeShader thresholdShader;
 
   @Language("AGSL") private static final String THRESHOLD_SHADER_SRC =
-    "uniform shader u_layer;\n" +
-    "uniform float u_level;\n" +
+    "uniform shader u_layer;" +
+    "uniform float u_level;" +
 
-    "half4 main(float2 fragCoord) {\n" +
-      "half4 c = u_layer.eval(fragCoord);\n" +
-      "half lum = dot(c.rgb, half3(0.2126, 0.7152, 0.0722));\n" +
-      "half bw = step(u_level, lum);\n" +
+    "half4 main(float2 fragCoord) {" +
+      "half4 c = u_layer.eval(fragCoord);" +
+      "half lum = dot(c.rgb, half3(0.2126, 0.7152, 0.0722));" +
+      "half bw = step(u_level, lum);" +
 
-      "return bw.xxx1 * c.a;\n" +
+      "return bw.xxx1 * c.a;" +
     "}";
 
   private static RuntimeShader makeShader() {
@@ -51,18 +51,8 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
     listener.onValueChanged();
   }
 
-  public void applyTo(Paint p) {
-    if (!isDirty || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-      return;
-    }
-    Shader shader = p.getShader();
-    if (shader != null) {
-      thresholdShader.setInputShader("u_layer", shader);
-    } else {
-      int c = p.getColor();
-      thresholdShader.setInputShader("u_layer", new LinearGradient(0f, 0f, 0f, 0f, c, c, Shader.TileMode.CLAMP));
-    }
+  public RuntimeShader getThresholdShader() {
     thresholdShader.setFloatUniform("u_level", level.getValue());
-    p.setShader(thresholdShader);
+    return this.thresholdShader;
   }
 }
