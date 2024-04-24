@@ -1,6 +1,5 @@
 package com.airbnb.lottie.parser;
 
-import android.graphics.RuntimeShader;
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 
 public class ThresholdEffect {
