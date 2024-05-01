@@ -1,5 +1,6 @@
 package com.airbnb.lottie.animation.keyframe;
 
+import android.annotation.TargetApi;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.RuntimeShader;
@@ -10,10 +11,10 @@ import com.airbnb.lottie.model.layer.BaseLayer;
 import com.airbnb.lottie.parser.ThresholdEffect;
 import org.intellij.lang.annotations.Language;
 
+@TargetApi(Build.VERSION_CODES.TIRAMISU)
 public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.AnimationListener {
   private final BaseKeyframeAnimation.AnimationListener listener;
   private final BaseKeyframeAnimation<Float, Float> level;
-  private boolean isDirty = true;
 
   private final RuntimeShader thresholdShader;
 
@@ -47,7 +48,6 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
   }
 
   @Override public void onValueChanged() {
-    isDirty = true;
     listener.onValueChanged();
   }
 

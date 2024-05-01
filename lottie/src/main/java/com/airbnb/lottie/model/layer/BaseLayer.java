@@ -9,6 +9,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RecordingCanvas;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.RenderEffect;
 import android.graphics.RenderNode;
@@ -36,7 +37,6 @@ import com.airbnb.lottie.model.content.LBlendMode;
 import com.airbnb.lottie.model.content.Mask;
 import com.airbnb.lottie.model.content.ShapeData;
 import com.airbnb.lottie.parser.DropShadowEffect;
-import com.airbnb.lottie.parser.ThresholdEffect;
 import com.airbnb.lottie.utils.Logger;
 import com.airbnb.lottie.utils.Utils;
 import com.airbnb.lottie.value.LottieValueCallback;
@@ -104,6 +104,8 @@ public abstract class BaseLayer
   private FloatKeyframeAnimation inOutAnimation;
   @Nullable
   private BaseLayer matteLayer;
+
+  private final RenderNode effectRenderNode;
   /**
    * This should only be used by {@link #buildParentLayerListIfNeeded()}
    * to construct the list of parent layers.
@@ -152,6 +154,8 @@ public abstract class BaseLayer
     if (layerModel.getThresholdEffect() != null) {
       this.thresholdEffectAnimation = new ThresholdKeyframeAnimation(this, this, layerModel.getThresholdEffect());
     }
+
+    this.effectRenderNode = new RenderNode("contentNode");
 
     setupInOutAnimations();
   }
@@ -239,16 +243,18 @@ public abstract class BaseLayer
   }
   @Override
   public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
-    RenderNode rn = new RenderNode("contentNode");
-    rn.setPosition(0, 0, canvas.getWidth() + 150, canvas.getHeight());
-    if (thresholdEffectAnimation != null) {
-      rn.setRenderEffect(RenderEffect.createRuntimeShaderEffect(thresholdEffectAnimation.getThresholdShader(),
+    Rect r = this.lottieDrawable.getBounds();
+    if (canvas.isHardwareAccelerated() && thresholdEffectAnimation != null) {
+      effectRenderNode.setPosition(0, 0, r.width(), r.height());
+      effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(thresholdEffectAnimation.getThresholdShader(),
           "u_layer"));
+      RecordingCanvas recordingCanvas = effectRenderNode.beginRecording();
+      onDraw(recordingCanvas, parentMatrix, parentAlpha);
+      effectRenderNode.endRecording();
+      canvas.drawRenderNode(effectRenderNode);
+    } else {
+      onDraw(canvas, parentMatrix, parentAlpha);
     }
-    RecordingCanvas recordingCanvas = rn.beginRecording();
-    onDraw(recordingCanvas, parentMatrix, parentAlpha);
-    rn.endRecording();
-    canvas.drawRenderNode(rn);
   }
 
   public void onDraw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
