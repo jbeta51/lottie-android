@@ -1,14 +1,10 @@
-package com.airbnb.lottie.animation.keyframe;
+package com.airbnb.lottie.effects;
 
 import android.annotation.TargetApi;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.RuntimeShader;
-import android.graphics.Shader;
 import android.os.Build;
-import androidx.annotation.Nullable;
+import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.model.layer.BaseLayer;
-import com.airbnb.lottie.parser.ThresholdEffect;
 import org.intellij.lang.annotations.Language;
 
 @TargetApi(Build.VERSION_CODES.TIRAMISU)

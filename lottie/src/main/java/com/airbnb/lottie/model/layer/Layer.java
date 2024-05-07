@@ -12,7 +12,7 @@ import com.airbnb.lottie.model.content.ContentModel;
 import com.airbnb.lottie.model.content.LBlendMode;
 import com.airbnb.lottie.model.content.Mask;
 import com.airbnb.lottie.parser.DropShadowEffect;
-import com.airbnb.lottie.parser.ThresholdEffect;
+import com.airbnb.lottie.effects.ThresholdEffect;
 import com.airbnb.lottie.value.Keyframe;
 
 import java.util.List;

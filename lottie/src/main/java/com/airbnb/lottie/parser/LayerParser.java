@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 
 import com.airbnb.lottie.LottieComposition;
+import com.airbnb.lottie.effects.ThresholdEffect;
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 import com.airbnb.lottie.model.animatable.AnimatableTextFrame;
 import com.airbnb.lottie.model.animatable.AnimatableTextProperties;

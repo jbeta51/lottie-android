@@ -28,7 +28,7 @@ import com.airbnb.lottie.animation.content.DrawingContent;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.FloatKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.MaskKeyframeAnimation;
-import com.airbnb.lottie.animation.keyframe.ThresholdKeyframeAnimation;
+import com.airbnb.lottie.effects.ThresholdKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.TransformKeyframeAnimation;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.model.KeyPathElement;

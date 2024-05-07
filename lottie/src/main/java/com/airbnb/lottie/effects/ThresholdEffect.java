@@ -1,4 +1,4 @@
-package com.airbnb.lottie.parser;
+package com.airbnb.lottie.effects;
 
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 

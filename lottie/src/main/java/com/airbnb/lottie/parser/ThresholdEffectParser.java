@@ -3,6 +3,7 @@ package com.airbnb.lottie.parser;
 import androidx.annotation.Nullable;
 
 import com.airbnb.lottie.LottieComposition;
+import com.airbnb.lottie.effects.ThresholdEffect;
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 import com.airbnb.lottie.parser.moshi.JsonReader;
 
