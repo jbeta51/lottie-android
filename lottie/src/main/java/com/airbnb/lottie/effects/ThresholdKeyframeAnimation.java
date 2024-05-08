@@ -1,6 +1,11 @@
 package com.airbnb.lottie.effects;
 
 import android.annotation.TargetApi;
+import android.graphics.Canvas;
+import android.graphics.RecordingCanvas;
+import android.graphics.Rect;
+import android.graphics.RenderEffect;
+import android.graphics.RenderNode;
 import android.graphics.RuntimeShader;
 import android.os.Build;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
@@ -8,11 +13,13 @@ import com.airbnb.lottie.model.layer.BaseLayer;
 import org.intellij.lang.annotations.Language;
 
 @TargetApi(Build.VERSION_CODES.TIRAMISU)
-public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.AnimationListener {
+public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.AnimationListener, LottieEffect {
   private final BaseKeyframeAnimation.AnimationListener listener;
   private final BaseKeyframeAnimation<Float, Float> level;
 
   private final RuntimeShader thresholdShader;
+
+  private final RenderNode effectRenderNode;
 
   @Language("AGSL") private static final String THRESHOLD_SHADER_SRC =
     "uniform shader u_layer;" +
@@ -41,14 +48,29 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
     baseLayer.addAnimation(level);
 
     thresholdShader = makeShader();
+
+    effectRenderNode = new RenderNode("threshold_effect");
+    Rect r = baseLayer.getDrawableBounds();
+    effectRenderNode.setPosition(0, 0, r.width(), r.height());
+    effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(this.thresholdShader,
+        "u_layer"));
   }
 
   @Override public void onValueChanged() {
     listener.onValueChanged();
   }
 
-  public RuntimeShader getThresholdShader() {
+  public void syncEffectNode() {
     thresholdShader.setFloatUniform("u_level", level.getValue());
-    return this.thresholdShader;
+    effectRenderNode.setPosition(0, 0, 10000, 10000);
+    effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(this.thresholdShader,
+        "u_layer"));
+  }
+
+  public RenderNode drawEffect(RenderNode renderNode) {
+    RecordingCanvas effectCanvas = effectRenderNode.beginRecording();
+    effectCanvas.drawRenderNode(renderNode);
+    effectRenderNode.endRecording();
+    return effectRenderNode;
   }
 }

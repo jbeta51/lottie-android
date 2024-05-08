@@ -105,7 +105,7 @@ public abstract class BaseLayer
   @Nullable
   private BaseLayer matteLayer;
 
-  private final RenderNode effectRenderNode;
+  private final RenderNode contentRenderNode;
   /**
    * This should only be used by {@link #buildParentLayerListIfNeeded()}
    * to construct the list of parent layers.
@@ -155,7 +155,7 @@ public abstract class BaseLayer
       this.thresholdEffectAnimation = new ThresholdKeyframeAnimation(this, this, layerModel.getThresholdEffect());
     }
 
-    this.effectRenderNode = new RenderNode("contentNode");
+    this.contentRenderNode = new RenderNode("contentNode");
 
     setupInOutAnimations();
   }
@@ -241,17 +241,24 @@ public abstract class BaseLayer
 
     boundsMatrix.preConcat(transform.getMatrix());
   }
+
+  public Rect getDrawableBounds() {
+    return this.lottieDrawable.getBounds();
+  }
   @Override
   public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     Rect r = this.lottieDrawable.getBounds();
     if (canvas.isHardwareAccelerated() && thresholdEffectAnimation != null) {
-      effectRenderNode.setPosition(0, 0, r.width(), r.height());
-      effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(thresholdEffectAnimation.getThresholdShader(),
-          "u_layer"));
-      RecordingCanvas recordingCanvas = effectRenderNode.beginRecording();
+      // draw content to base node
+      contentRenderNode.setPosition(0, 0, r.width(), r.height());
+      RecordingCanvas recordingCanvas = contentRenderNode.beginRecording();
       onDraw(recordingCanvas, parentMatrix, parentAlpha);
-      effectRenderNode.endRecording();
-      canvas.drawRenderNode(effectRenderNode);
+      contentRenderNode.endRecording();
+
+      // redraw content node to effect node with filter
+      thresholdEffectAnimation.syncEffectNode();
+      RenderNode rn = thresholdEffectAnimation.drawEffect(contentRenderNode);
+      canvas.drawRenderNode(rn);
     } else {
       onDraw(canvas, parentMatrix, parentAlpha);
     }

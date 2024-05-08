@@ -6,7 +6,7 @@ public class ThresholdEffect {
 
   private final AnimatableFloatValue level;
 
-  ThresholdEffect(AnimatableFloatValue level) {
+  public ThresholdEffect(AnimatableFloatValue level) {
     this.level = level;
   }
 
