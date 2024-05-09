@@ -3,6 +3,7 @@ package com.airbnb.lottie.model.layer;
 import androidx.annotation.Nullable;
 
 import com.airbnb.lottie.LottieComposition;
+import com.airbnb.lottie.effects.EffectManager;
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 import com.airbnb.lottie.model.animatable.AnimatableTextFrame;
 import com.airbnb.lottie.model.animatable.AnimatableTextProperties;
@@ -65,7 +66,7 @@ public class Layer {
   @Nullable private final DropShadowEffect dropShadowEffect;
   private final LBlendMode blendMode;
 
-  @Nullable private final ThresholdEffect thresholdEffect;
+  @Nullable private final EffectManager effectManager;
 
 
   public Layer(List<ContentModel> shapes, LottieComposition composition, String layerName, long layerId,
@@ -75,7 +76,7 @@ public class Layer {
       @Nullable AnimatableTextFrame text, @Nullable AnimatableTextProperties textProperties,
       List<Keyframe<Float>> inOutKeyframes, MatteType matteType,
       @Nullable AnimatableFloatValue timeRemapping, boolean hidden, @Nullable BlurEffect blurEffect,
-      @Nullable DropShadowEffect dropShadowEffect, LBlendMode blendMode, @Nullable ThresholdEffect thresholdEffect) {
+      @Nullable DropShadowEffect dropShadowEffect, LBlendMode blendMode, EffectManager effectManager) {
     this.shapes = shapes;
     this.composition = composition;
     this.layerName = layerName;
@@ -101,7 +102,7 @@ public class Layer {
     this.blurEffect = blurEffect;
     this.dropShadowEffect = dropShadowEffect;
     this.blendMode = blendMode;
-    this.thresholdEffect = thresholdEffect;
+    this.effectManager = effectManager;
   }
 
   LottieComposition getComposition() {
@@ -209,8 +210,12 @@ public class Layer {
     return dropShadowEffect;
   }
 
-  @Nullable public ThresholdEffect getThresholdEffect() {
-    return thresholdEffect;
+  @Nullable public EffectManager getEffectManager() {
+    return effectManager;
+  }
+
+  public boolean hasEffects() {
+    return effectManager != null && effectManager.hasEffects();
   }
 
   public String toString(String prefix) {

@@ -11,7 +11,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RecordingCanvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.RenderEffect;
 import android.graphics.RenderNode;
 import android.os.Build;
 
@@ -28,8 +27,8 @@ import com.airbnb.lottie.animation.content.DrawingContent;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.FloatKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.MaskKeyframeAnimation;
-import com.airbnb.lottie.effects.ThresholdKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.TransformKeyframeAnimation;
+import com.airbnb.lottie.effects.EffectManager;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.model.KeyPathElement;
 import com.airbnb.lottie.model.content.BlurEffect;
@@ -124,7 +123,6 @@ public abstract class BaseLayer
   float blurMaskFilterRadius = 0f;
   @Nullable BlurMaskFilter blurMaskFilter;
 
-  ThresholdKeyframeAnimation thresholdEffectAnimation;
   BaseLayer(LottieDrawable lottieDrawable, Layer layerModel) {
     this.lottieDrawable = lottieDrawable;
     this.layerModel = layerModel;
@@ -151,8 +149,8 @@ public abstract class BaseLayer
       }
     }
 
-    if (layerModel.getThresholdEffect() != null) {
-      this.thresholdEffectAnimation = new ThresholdKeyframeAnimation(this, this, layerModel.getThresholdEffect());
+    if (layerModel.getEffectManager() != null) {
+      layerModel.getEffectManager().initEffectAnimations(this);
     }
 
     this.contentRenderNode = new RenderNode("contentNode");
@@ -245,10 +243,11 @@ public abstract class BaseLayer
   public Rect getDrawableBounds() {
     return this.lottieDrawable.getBounds();
   }
+
   @Override
   public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     Rect r = this.lottieDrawable.getBounds();
-    if (canvas.isHardwareAccelerated() && thresholdEffectAnimation != null) {
+    if (canvas.isHardwareAccelerated() && layerModel.hasEffects()) {
       // draw content to base node
       contentRenderNode.setPosition(0, 0, r.width(), r.height());
       RecordingCanvas recordingCanvas = contentRenderNode.beginRecording();
@@ -256,8 +255,8 @@ public abstract class BaseLayer
       contentRenderNode.endRecording();
 
       // redraw content node to effect node with filter
-      thresholdEffectAnimation.syncEffectNode();
-      RenderNode rn = thresholdEffectAnimation.drawEffect(contentRenderNode);
+      layerModel.getEffectManager().syncEffects();
+      RenderNode rn = layerModel.getEffectManager().drawEffects(contentRenderNode);
       canvas.drawRenderNode(rn);
     } else {
       onDraw(canvas, parentMatrix, parentAlpha);

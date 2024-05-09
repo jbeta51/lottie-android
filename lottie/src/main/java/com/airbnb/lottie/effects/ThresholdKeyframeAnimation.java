@@ -13,13 +13,14 @@ import com.airbnb.lottie.model.layer.BaseLayer;
 import org.intellij.lang.annotations.Language;
 
 @TargetApi(Build.VERSION_CODES.TIRAMISU)
-public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.AnimationListener, LottieEffect {
+public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.AnimationListener {
   private final BaseKeyframeAnimation.AnimationListener listener;
   private final BaseKeyframeAnimation<Float, Float> level;
 
   private final RuntimeShader thresholdShader;
 
   private final RenderNode effectRenderNode;
+  private final Rect effectBounds;
 
   @Language("AGSL") private static final String THRESHOLD_SHADER_SRC =
     "uniform shader u_layer;" +
@@ -50,8 +51,8 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
     thresholdShader = makeShader();
 
     effectRenderNode = new RenderNode("threshold_effect");
-    Rect r = baseLayer.getDrawableBounds();
-    effectRenderNode.setPosition(0, 0, r.width(), r.height());
+    this.effectBounds = baseLayer.getDrawableBounds();
+    effectRenderNode.setPosition(0, 0, effectBounds.width(), effectBounds.height());
     effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(this.thresholdShader,
         "u_layer"));
   }
@@ -62,7 +63,7 @@ public class ThresholdKeyframeAnimation implements BaseKeyframeAnimation.Animati
 
   public void syncEffectNode() {
     thresholdShader.setFloatUniform("u_level", level.getValue());
-    effectRenderNode.setPosition(0, 0, 10000, 10000);
+    effectRenderNode.setPosition(0, 0, effectBounds.width(), effectBounds.height());
     effectRenderNode.setRenderEffect(RenderEffect.createRuntimeShaderEffect(this.thresholdShader,
         "u_layer"));
   }
