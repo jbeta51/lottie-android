@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.Rect;
 
 import com.airbnb.lottie.LottieComposition;
+import com.airbnb.lottie.effects.EffectManager;
+import com.airbnb.lottie.effects.ThresholdEffect;
 import com.airbnb.lottie.model.animatable.AnimatableFloatValue;
 import com.airbnb.lottie.model.animatable.AnimatableTextFrame;
 import com.airbnb.lottie.model.animatable.AnimatableTextProperties;
@@ -63,7 +65,7 @@ public class LayerParser {
         new AnimatableTransform(), 0, 0, 0, 0, 0,
         bounds.width(), bounds.height(), null, null, Collections.<Keyframe<Float>>emptyList(),
         Layer.MatteType.NONE, null, false, null, null,
-        LBlendMode.NORMAL);
+        LBlendMode.NORMAL, null);
   }
 
   private static final JsonReader.Options TEXT_NAMES = JsonReader.Options.of(
@@ -97,6 +99,7 @@ public class LayerParser {
     boolean hidden = false;
     BlurEffect blurEffect = null;
     DropShadowEffect dropShadowEffect = null;
+    EffectManager effectManager = new EffectManager();
     boolean autoOrient = false;
 
     Layer.MatteType matteType = Layer.MatteType.NONE;
@@ -216,6 +219,8 @@ public class LayerParser {
                     blurEffect = BlurEffectParser.parse(reader, composition);
                   } else if (type == 25) {
                     dropShadowEffect = new DropShadowEffectParser().parse(reader, composition);
+                  } else if (type == 5) {
+                    effectManager.addEffect(new ThresholdEffectParser().parse(reader, composition));
                   }
                   break;
                 case 1:
@@ -311,6 +316,6 @@ public class LayerParser {
     return new Layer(shapes, composition, layerName, layerId, layerType, parentId, refId,
         masks, transform, solidWidth, solidHeight, solidColor, timeStretch, startFrame,
         preCompWidth, preCompHeight, text, textProperties, inOutKeyframes, matteType,
-        timeRemapping, hidden, blurEffect, dropShadowEffect, blendMode);
+        timeRemapping, hidden, blurEffect, dropShadowEffect, blendMode, effectManager);
   }
 }
